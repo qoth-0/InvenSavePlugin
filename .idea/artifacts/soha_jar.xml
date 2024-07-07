@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="soha:jar">
+    <output-path>$PROJECT_DIR$/../../mac/plugins</output-path>
+    <root id="archive" name="soha.jar">
+      <element id="module-output" name="soha.main" />
+    </root>
+  </artifact>
+</component>

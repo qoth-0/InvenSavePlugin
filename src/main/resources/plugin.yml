@@ -1,0 +1,9 @@
+name: inventorySave
+version: '${version}'
+main: hobaeck.soha.InventorySave
+api-version: '1.20'
+
+commands:
+  인벤세이브:
+    description: 인벤세이브 아이템 생성
+    usage: /<command> 생성
