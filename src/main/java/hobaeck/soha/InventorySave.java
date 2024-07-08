@@ -1,16 +1,13 @@
 package hobaeck.soha;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -43,6 +40,16 @@ public final class InventorySave extends JavaPlugin implements Listener, Command
             excludeInventory.setContents(savedInventory.getContents());
         }
         p.openInventory(excludeInventory);
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        Player p = (Player) event.getPlayer();
+        Inventory inventory = event.getInventory();
+        if (inventory == excludeInventory) {
+            playerInventories.put(p.getName(), inventory);
+            p.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
+        }
     }
 
     @Override
@@ -82,6 +89,41 @@ public final class InventorySave extends JavaPlugin implements Listener, Command
             }
         }
         return true;
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player p = event.getEntity();
+        boolean hasInventorySave = false;
+
+        excludeInventory = playerInventories.get(p.getName());
+        List<ItemStack> excludeItems = new ArrayList<>();
+        if (excludeInventory != null) {
+            for (ItemStack item : excludeInventory.getContents()) {
+                if (item != null) {
+                    excludeItems.add(item);
+                }
+            }
+        }
+
+        // 인벤세이브 아이템이 있는지 확인
+        for (ItemStack item : p.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.DIAMOND && item.getItemMeta().getDisplayName().equals("인벤세이브권")) {
+                hasInventorySave = true;
+                item.setAmount(item.getAmount() - 1);
+                break;
+            }
+        }
+
+        if(hasInventorySave) {
+            // 인벤세이브 제외 아이템 제거
+            for (ItemStack excludeItem : excludeItems) {
+                p.getInventory().removeItem(excludeItem);
+            }
+            event.setKeepInventory(true);
+            event.getDrops().clear();
+        }
+        p.sendMessage("인벤세이브권으로 인벤토리가 유지됩니다.");
     }
 
     @Override
@@ -125,50 +167,5 @@ public final class InventorySave extends JavaPlugin implements Listener, Command
     public void a3(PlayerChatEvent a) {
         Player p = a.getPlayer();
         p.sendMessage("플레이어 이름" + p.getName());
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player p = event.getEntity();
-        boolean hasInventorySave = false;
-
-        excludeInventory = playerInventories.get(p.getName());
-        List<ItemStack> excludeItems = new ArrayList<>();
-        if (excludeInventory != null) {
-            for (ItemStack item : excludeInventory.getContents()) {
-                if (item != null) {
-                    excludeItems.add(item);
-                }
-            }
-        }
-
-        // 인벤세이브 아이템이 있는지 확인
-        for (ItemStack item : p.getInventory().getContents()) {
-            if (item != null && item.getType() == Material.DIAMOND && item.getItemMeta().getDisplayName().equals("인벤세이브권")) {
-                hasInventorySave = true;
-                item.setAmount(item.getAmount() - 1);
-                break;
-            }
-        }
-
-        if(hasInventorySave) {
-            // 인벤세이브 제외 아이템 제거
-            for (ItemStack excludeItem : excludeItems) {
-                p.getInventory().removeItem(excludeItem);
-            }
-            event.setKeepInventory(true);
-            event.getDrops().clear();
-        }
-        p.sendMessage("인벤세이브권으로 인벤토리가 유지됩니다.");
-    }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        Player p = (Player) event.getPlayer();
-        Inventory inventory = event.getInventory();
-        if (inventory == excludeInventory) {
-            playerInventories.put(p.getName(), inventory);
-            p.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
-        }
     }
 }
