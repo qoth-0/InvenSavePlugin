@@ -33,7 +33,7 @@ java {
 
 copy {
     from 'build/libs/soha-1.0-SNAPSHOT.jar'
-    into '../server/plugins'
+    into 'C:\\Users\\bny13\\OneDrive\\Desktop\\mac\\plugins'
 }
 
 tasks.withType(JavaCompile).configureEach {

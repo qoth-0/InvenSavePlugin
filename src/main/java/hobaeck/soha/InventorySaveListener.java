@@ -14,16 +14,22 @@ import java.util.*;
 
 public final class InventorySaveListener implements Listener {
 
-    // 타이틀 비교 방법,
+    private final BlackListInventoryManager blackListInventoryManager;
+    private final InventorySave inventorySave;
 
+    public InventorySaveListener(BlackListInventoryManager blackListInventoryManager, InventorySave inventorySave) {
+        this.blackListInventoryManager = blackListInventoryManager;
+        this.inventorySave = inventorySave;
+    }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        Player p = (Player) event.getPlayer();
+        Player player = (Player) event.getPlayer();
         Inventory inventory = event.getInventory();
-        if (event.getView().getOriginalTitle().equals(p.getUniqueId().toString())) {
-            BlackListInventoryManager.saveInventory(p, Arrays.asList(inventory.getContents()));
-            p.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
+        if (event.getView().getOriginalTitle().equals(player.getUniqueId().toString())) {
+            blackListInventoryManager.saveInventory(player.getUniqueId(), Arrays.asList(inventory.getContents()));
+//            blackListInventoryManager.saveBlackListItems();
+            player.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
         }
     }
 
@@ -32,22 +38,19 @@ public final class InventorySaveListener implements Listener {
         Player player = event.getEntity();
         boolean hasInventorySave = false;
 
-        List<ItemStack> excludeItems = BlackListInventoryManager.getPlayerBlackListItems(player);
+        List<ItemStack> excludeItems = blackListInventoryManager.getPlayerBlackListItems(player);
+        Inventory inventory = player.getInventory();
+
+        NamespacedKey key = new NamespacedKey("soha", "inventory_save_ticket");
 
         // 인벤세이브 아이템이 있는지 확인
-        for (ItemStack item : player.getInventory().getContents()) {
+        for (ItemStack item : inventory) {
 
-            NamespacedKey key = NamespacedKey.fromString("inventory_save_ticket");
-
-            if (item == null) {
+            if (item == null  || item.getItemMeta() == null) {
                 continue;
             }
 
-            if (key == null) {
-                continue;
-            }
-
-            if (!item.getItemMeta().getPersistentDataContainer().has(key)) {
+            if (!item.getItemMeta().getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
                 continue;
             }
 
@@ -61,15 +64,36 @@ public final class InventorySaveListener implements Listener {
             }
         }
 
+        inventorySave.getLogger().info(hasInventorySave + "");
+
         if (hasInventorySave) {
-            // 인벤세이브 제외 아이템 제거
-            for (ItemStack excludeItem : excludeItems) {
-                player.getInventory().removeItem(excludeItem);
+            if (excludeItems != null) {
+                // null 값을 제외한 새로운 리스트 생성
+                List<ItemStack> filteredExcludeItems = new ArrayList<>();
+                for (ItemStack excludeItem : excludeItems) {
+                    if (excludeItem != null) {
+                        filteredExcludeItems.add(excludeItem);
+                    }
+                }
+
+                // 인벤세이브 제외 아이템 제거
+                for (ItemStack excludeItem : filteredExcludeItems) {
+                    removeAllItemsOfType(inventory, excludeItem);
+                }
             }
             event.setKeepInventory(true);
             event.getDrops().clear();
+            player.sendMessage("인벤세이브권으로 인벤토리가 유지됩니다.");
+            hasInventorySave = false;
         }
-        player.sendMessage("인벤세이브권으로 인벤토리가 유지됩니다.");
+    }
+    private void removeAllItemsOfType(Inventory inventory, ItemStack item) {
+        ItemStack[] items = inventory.getContents();
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] != null && items[i].isSimilar(item)) {
+                inventory.setItem(i, null);
+            }
+        }
     }
 
 }

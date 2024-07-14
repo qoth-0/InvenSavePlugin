@@ -17,16 +17,19 @@ import java.util.Objects;
  */
 public final class InventorySave extends JavaPlugin {
 
+    private BlackListInventoryManager blackListInventoryManager = new BlackListInventoryManager();
+
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new InventorySaveListener(), this);
-        InventorySaveCommand inventorySaveCommand = new InventorySaveCommand();
+        saveDefaultConfig();
+        getServer().getPluginManager().registerEvents(new InventorySaveListener(blackListInventoryManager, this), this);
+        InventorySaveCommand inventorySaveCommand = new InventorySaveCommand(blackListInventoryManager);
         Objects.requireNonNull(getCommand("인벤세이브")).setExecutor(inventorySaveCommand);
         Objects.requireNonNull(getCommand("인벤세이브")).setTabCompleter(inventorySaveCommand);
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("안녕히가세용~~~");
+//        blackListInventoryManager.saveBlackListItems();
     }
 }
