@@ -28,7 +28,7 @@ public final class InventorySaveListener implements Listener {
         Inventory inventory = event.getInventory();
         if (event.getView().getOriginalTitle().equals(player.getUniqueId().toString())) {
             blackListInventoryManager.saveInventory(player.getUniqueId(), Arrays.asList(inventory.getContents()));
-//            blackListInventoryManager.saveBlackListItems();
+            blackListInventoryManager.saveBlackListItems();
             player.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
         }
     }

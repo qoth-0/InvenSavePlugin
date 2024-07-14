@@ -17,11 +17,11 @@ import java.util.Objects;
  */
 public final class InventorySave extends JavaPlugin {
 
-    private BlackListInventoryManager blackListInventoryManager = new BlackListInventoryManager();
+    private BlackListInventoryManager blackListInventoryManager = new BlackListInventoryManager(this);
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+//        saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new InventorySaveListener(blackListInventoryManager, this), this);
         InventorySaveCommand inventorySaveCommand = new InventorySaveCommand(blackListInventoryManager);
         Objects.requireNonNull(getCommand("인벤세이브")).setExecutor(inventorySaveCommand);
@@ -30,6 +30,6 @@ public final class InventorySave extends JavaPlugin {
 
     @Override
     public void onDisable() {
-//        blackListInventoryManager.saveBlackListItems();
+        blackListInventoryManager.saveBlackListItems();
     }
 }

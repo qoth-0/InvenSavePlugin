@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/InvenSavePlugin.soha.main.iml" filepath="$PROJECT_DIR$/.idea/modules/InvenSavePlugin.soha.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/hobaeck.soha.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hobaeck.soha.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/soha.main.iml" filepath="$PROJECT_DIR$/.idea/modules/soha.main.iml" />
     </modules>

@@ -15,16 +15,16 @@ public class BlackListInventoryManager {
 
     private static final Map<UUID, List<ItemStack>> playerByBlackListItems = new HashMap<>();
 
-//    private final InventorySave inventorySave;
+    private final InventorySave inventorySave;
 
-//    private final File file;
-//    private final YamlConfiguration dataConfig;
+    private final File file;
+    private final YamlConfiguration dataConfig;
 
-    public BlackListInventoryManager() {
-//        this.inventorySave = inventorySave;
-//        this.file = new File(inventorySave.getDataFolder(), "blacklist_itmes.yml");
-//        this.dataConfig = YamlConfiguration.loadConfiguration(file);
-//        loadBlackListItems();
+    public BlackListInventoryManager(InventorySave inventorySave) {
+        this.inventorySave = inventorySave;
+        this.file = new File(inventorySave.getDataFolder(), "blacklist_items.yml");
+        this.dataConfig = YamlConfiguration.loadConfiguration(file);
+        loadBlackListItems();
     }
 
     public void openExcludeInventory(Player player) {
@@ -45,24 +45,24 @@ public class BlackListInventoryManager {
         return playerByBlackListItems.get(player.getUniqueId());
     }
 
-//    public void saveBlackListItems() {
-//        for (Map.Entry<UUID, List<ItemStack>> entry : playerByBlackListItems.entrySet()) {
-//            List<ItemStack> items = entry.getValue();
-//            dataConfig.set(entry.getKey().toString(), items);
-//        }
-//        try {
-//            dataConfig.save(file);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void loadBlackListItems() {
-//        for (String key : dataConfig.getKeys(false)) {
-//            UUID playerUUID = UUID.fromString(key);
-//            List<ItemStack> items = (List<ItemStack>) dataConfig.getList(key);
-//            saveInventory(playerUUID, items);
-//        }
-//    }
+    public void saveBlackListItems() {
+        for (Map.Entry<UUID, List<ItemStack>> entry : playerByBlackListItems.entrySet()) {
+            List<ItemStack> items = entry.getValue();
+            dataConfig.set(entry.getKey().toString(), items);
+        }
+        try {
+            dataConfig.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadBlackListItems() {
+        for (String key : dataConfig.getKeys(false)) {
+            UUID playerUUID = UUID.fromString(key);
+            List<ItemStack> items = (List<ItemStack>) dataConfig.getList(key);
+            saveInventory(playerUUID, items);
+        }
+    }
 
 }
