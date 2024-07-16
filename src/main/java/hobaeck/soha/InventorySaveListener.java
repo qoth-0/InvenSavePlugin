@@ -5,12 +5,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class InventorySaveListener implements Listener {
 
@@ -20,17 +20,6 @@ public final class InventorySaveListener implements Listener {
     public InventorySaveListener(BlackListInventoryManager blackListInventoryManager, InventorySave inventorySave) {
         this.blackListInventoryManager = blackListInventoryManager;
         this.inventorySave = inventorySave;
-    }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        Inventory inventory = event.getInventory();
-        if (event.getView().getOriginalTitle().equals(player.getUniqueId().toString())) {
-            blackListInventoryManager.saveInventory(player.getUniqueId(), Arrays.asList(inventory.getContents()));
-            blackListInventoryManager.saveBlackListItems();
-            player.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
-        }
     }
 
     @EventHandler
