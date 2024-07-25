@@ -1,6 +1,7 @@
 package hobaeck.soha;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -9,7 +10,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BlackListInventory extends CustomInventory {
 
@@ -21,28 +24,49 @@ public class BlackListInventory extends CustomInventory {
 
     @Override
     void onInventoryOpenEvent(InventoryOpenEvent event) {
-        List<ItemStack> excludeItems = blackListInventoryManager.getPlayerBlackListItems((Player) event.getPlayer());
+        Player player = (Player) event.getPlayer();
+        List<ItemStack> excludeItems = blackListInventoryManager.getPlayerBlackListItems(player);
         if (excludeItems != null) {
             inventory.setContents(excludeItems.toArray(new ItemStack[0]));
         }
+        ItemStack nonClick = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        inventory.setItem(45, nonClick);
+        inventory.setItem(46, nonClick);
+        inventory.setItem(47, nonClick);
+        inventory.setItem(48, nonClick);
+        inventory.setItem(50, nonClick);
+        inventory.setItem(51, nonClick);
+        inventory.setItem(52, nonClick);
+        inventory.setItem(53, nonClick);
+
+
+        ItemStack saveButton = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+        inventory.setItem(49, saveButton);
+
     }
 
     @Override
     void onInventoryCloseEvent(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        Inventory inventory = event.getInventory();
-        if (event.getView().getOriginalTitle().equals(player.getUniqueId().toString())) {
-            blackListInventoryManager.saveInventory(player.getUniqueId(), Arrays.asList(inventory.getContents()));
-            blackListInventoryManager.saveBlackListItems();
-            player.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
-        }
+
     }
 
     @Override
     void onInventoryClickEvent(InventoryClickEvent event) {
-        if (event.getSlot() == 45) {
-            // save item with close
-            return;
+        Player player = (Player) event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+
+        int slot = event.getSlot();
+        if (event.getView().getOriginalTitle().equals("블랙리스트 아이템 설정")) {
+
+            if (slot == 49) {
+                blackListInventoryManager.saveInventory(player.getUniqueId(), Arrays.asList(inventory.getContents()));
+                blackListInventoryManager.saveBlackListItems();
+                player.sendMessage("아이템을 인벤세이브에서 제외하였습니다.");
+                event.setCancelled(true);
+            }
+            if(slot >= 45 && slot <= 53) {
+                event.setCancelled(true);
+            }
         }
     }
 }

@@ -11,10 +11,18 @@ import java.util.*
  */
 class InventorySave : JavaPlugin() {
 
-    private val blackListInventoryManager = BlackListInventoryManager()
+    companion object {
+        // singleton
+        @JvmStatic
+        var instance: InventorySave? = null
+            private set
+    }
+
+    private lateinit var blackListInventoryManager: BlackListInventoryManager
 
     override fun onEnable() {
         instance = this
+        blackListInventoryManager = BlackListInventoryManager()
         server.pluginManager.registerEvents(InventorySaveListener(blackListInventoryManager, this), this)
         val inventorySaveCommand = InventorySaveCommand(blackListInventoryManager)
         Objects.requireNonNull(getCommand("인벤세이브"))?.setExecutor(inventorySaveCommand)
@@ -23,12 +31,5 @@ class InventorySave : JavaPlugin() {
 
     override fun onDisable() {
         blackListInventoryManager.saveBlackListItems()
-    }
-
-    companion object {
-        // singleton
-        @JvmStatic
-        var instance: InventorySave? = null
-            private set
     }
 }
